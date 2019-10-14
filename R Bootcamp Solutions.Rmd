@@ -1,0 +1,174 @@
+---
+title: "ECON 329 R Bootcamp Solutions"
+author: "Matt Kaye"
+date: "4/3/2019"
+output: pdf_document
+---
+
+```{r setup}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+
+#put message = F and warning = F in this chunk
+#so that you don't print warning or package startup messages
+```
+
+```{r install.packages, eval = FALSE}
+check.packages <- function(pkg){
+    new.pkg <- pkg[!(pkg %in% installed.packages()[, "Package"])]
+    if (length(new.pkg)) 
+        install.packages(new.pkg, dependencies = TRUE)
+    sapply(pkg, require, character.only = TRUE)
+}
+#install if you don't have these
+#this chunk is only here for install help -- don't put install chunks in your RMD
+#use the console to install the packages instead
+check.packages("tidyverse")
+check.packages("gapminder")
+check.packages("stargazer")
+check.packages("kableExtra")
+```
+
+#This is how you make a header -- more \# signs will make the header smaller
+```{r load.packages}
+#empty working environment to keep R workspace clean
+rm(list = ls())
+
+#load packages
+library(gapminder)
+library(tidyverse)
+library(stargazer)
+library(knitr)
+
+#sets seed for random number generator so your bootstraps, random samples, etc
+#will always knit the same
+set.seed(10065) 
+```
+
+#Question 2 and Inline R!
+```{r summary.stats, results='asis'}
+#need results = 'asis' for stargazer(type = "latex") to work
+
+df <- gapminder
+
+df %>% #pipe operator -- makes df (left side) the first parameter in data.frame()
+  data.frame() %>%
+  select(4:6) %>% #use select() from dplyr to pick columns 4 through 6
+  stargazer(header = FALSE, font.size = 'footnotesize') #stargazer summary stats table
+```
+
+You should type your answers to questions here, like this. If you have something in an R chunk that you want to print out as part of an answer (like the mean of gdpPercap, for example), you can print it inline like this: $`r round(mean(df$gdpPercap), digits = 3)`$. This will come in especially handy if you mess something up in question 1 that causes all of your answers to later questions to be off... Instead of needing to change everything, inline R will fix update everything for you.
+
+#Question 3
+
+```{r q1, fig.align="center"}
+df %>% #use the pipe operator -- passes df into filter as first parameter
+  filter(year == 2007) %>% #subset data to only 2007
+  ggplot(aes(x = lifeExp, y = gdpPercap))+ #create ggplot
+  geom_point() #add layer for point (i.e. scatter plot)
+```
+\newpage
+
+#Question 4
+
+```{r q2, fig.align = "center"}
+df %>%
+  #use %in% with filter to keep multiple years
+  filter(year %in% c(1957, 1977, 1997, 2007)) %>% 
+  #add colors and sizes
+  ggplot(aes(x = lifeExp, y = gdpPercap, color = continent, size = pop))+ 
+   #alpha blend the points -- make them translucent to make the plot clearer
+  geom_point(alpha = .5)+
+  scale_y_log10()+ #put the y on log scale
+  #facet wrapper -- makes one plot for each category of the variable after "~"
+  facet_wrap(~year, ncol = 2, nrow = 2)+ 
+  #add plot labels
+  labs(x = "Life Expectancy", 
+       y = "GDP Per Capita (log scale)", 
+       title = "GDP vs. Life Expectancy")
+```
+
+\newpage 
+
+#Question 5
+```{r, fig.align = "center"}
+df %>%
+  filter(year %in% c(1957, 2007)) %>%
+  group_by(continent, year) %>% #sets continent and year as "grouping variables"
+                                #lets us perform operations on every row within each group
+  summarise(gdp = mean(gdpPercap)) %>% #calc mean gdpPercap for each continent-year pair
+  spread(year, gdp) %>%  #create two new columns from the data frame we created above
+  kable(format = 'latex', digits = 0) %>% #use kable to create nicely formatted tables
+  kableExtra::row_spec(0, bold = TRUE) %>% #made header bold
+  kableExtra::kable_styling(latex_options = "striped") %>% #made table striped
+  kableExtra::add_header_above("GDP Per Capita")
+```
+\newpage
+
+#Question 6:
+```{r, fig.align="center"}
+codes <- country_codes
+df <- df %>%
+  #left join attaches all rows matching the "by" in table 2 to table 1
+  left_join(codes, by = "country") %>% 
+  select(2, 1, 7, 3:6) %>% #selects columns by index
+  mutate(pop = pop / 1000) #adds column
+
+df %>%
+  filter(year == 2007) %>%
+  sample_n(10, FALSE) %>% #random sample of 10 rows without replacement
+  arrange(continent, country) %>%
+  kable(format = 'latex', digits = 0) %>% #use kable to create nicely formatted tables
+  kableExtra::row_spec(0, bold = TRUE) %>% #made header bold
+  kableExtra::kable_styling(latex_options = "striped") %>% #made table striped
+  kableExtra::add_header_above("Random Country Sample") %>% #add title
+  kableExtra::footnote(symbol = "population in thousands") #add a note
+```
+
+
+#Appendix Of Useful Latex Stuff
+
+
+If you want to make some text \textbf{bold} or \textit{italic}, do this
+
+If you want to make your regression equations look nice, do something like this:
+
+$$Y = \hat{\beta_{0}} + \hat{\beta_{1}}\cdot X + \epsilon$$
+
+The dollar signs tell Rmarkdown to use LaTeX's math mode, which lets you use Greek letters, subscripts, etc.
+
+\indent lets you indent a line
+\noindent stops a line from being indented.
+
+\begin{itemize}
+\item lets you add bullet points
+\end{itemize}
+
+\begin{enumerate}
+\item same idea for adding numbered bullets
+\end{enumerate}
+
+if you want to make equations really fancy (to do derivations of properties of summations, for example), you can do something like this:
+
+\begin{center}
+\begin{align*}
+X &= Y\\
+Y &= Z\\
+\implies X &= Z
+\end{align*}
+\end{center}
+
+\begin{center}
+this is how you center text
+\end{center}
+
+and this is how you skip some space
+
+\vspace{1cm}
+
+Now, some potentially helpful side notes: First, Detexify (for LaTeX) and StackOverflow are great resources for help on LaTeX and R questions. Also, the R documentation on all of these functions is really good. Doing something line ?filter or ?ggplot in the R console will open the documentation (or you can just Google it).
+
+
+
+
+
+

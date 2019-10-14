@@ -1,0 +1,35 @@
+---
+title: "ECON 329 R Bootcamp"
+author: "Matt Kaye"
+date: "4/3/2019"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+```
+
+#Problems:
+
+\begin{enumerate}
+\item Download the tidyverse, stargazer, and gapminder packages
+\item Load the Gapminder data (Gapminder, not Gapminder Unfiltered) and create a \textit{nicely formatted} table of summary statistics for the lifeExp, pop, and gdpPercap columns in Gapminder
+\item Create a plot of GDP Per Capita against Life Expectancy in 2007
+\item Now, update your plot to include as many the following as you can:
+  \begin{itemize}
+  \item color the points on the plot by continent
+  \item size the points by population
+  \item rescale one or both of the variables in the plot to make it more interpretable
+  \item add labels for the x axis and y axis, and title the plot
+  \item \textit{cool bonus: }create individual plots for each year in 1957, 1977, 1997, and 2007 using facet wrapping
+  \end{itemize}
+\item Create a \textit{nicely formatted} table with the average GDP for each continent in 1957 and 2007
+\item Create a \textit{nicely formatted} table showing the Gapminder statistics \textbf{including ISO codes\\ from country\_codes in the Gapminder package} for a random sample of 10 countries in 2007
+\end{enumerate}
+
+
+
+
+
+
+
