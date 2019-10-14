@@ -6,3 +6,4 @@ Goals:
 
 - A basic introduction to the Tidyverse and LaTeX, specifically aimed at showcasing how powerful these tools can be.
 - Introducing new Tidyverse users to the syntax and logic of the Tidyverse, including the grammars of dplyr and ggplot2 and the importance of the pipe operator
+- Show some best practices and handy tricks for visualization, data wrangling, output formatting, code commenting, etc.
